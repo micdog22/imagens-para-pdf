@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Imagens para PDF: junte fotos em um PDF direto no navegador</title>
+  <meta name="description" content="Junte fotos e digitalizações JPEG, PNG e WebP em um PDF sem enviar nada para a internet: reordene, gire, escolha A4, Carta ou o tamanho da imagem, ajuste a qualidade e converta documentos para tons de cinza.">
+  <meta name="theme-color" content="#b45309">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <h1>Imagens para PDF</h1>
+    <p class="lead">Junte fotos e digitalizações em um único PDF. As imagens não saem do seu computador: o arquivo é montado aqui mesmo, no navegador.</p>
+  </header>
+
+  <main>
+    <section class="card" aria-labelledby="images-title">
+      <h2 id="images-title">Imagens</h2>
+      <div class="drop" id="drop">
+        <p><strong>Arraste as imagens para cá</strong> ou</p>
+        <label class="btn" for="files">Escolher imagens</label>
+        <input id="files" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple class="visually-hidden">
+        <p class="muted small">JPEG, PNG ou WebP. A ordem da lista é a ordem das páginas.</p>
+      </div>
+      <div class="toolbar" id="toolbar" hidden>
+        <p id="count" class="muted small"></p>
+        <div class="toolbar-actions">
+          <button type="button" class="btn secondary small" id="sort-name">Ordenar por nome</button>
+          <button type="button" class="btn secondary small" id="clear">Remover todas</button>
+        </div>
+      </div>
+      <ol class="thumbs" id="thumbs" aria-label="Páginas do PDF"></ol>
+      <p id="list-msg" class="visually-hidden" aria-live="polite"></p>
+      <div id="load-msg" class="notes" aria-live="polite"></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card" aria-labelledby="page-title">
+        <h2 id="page-title">Página</h2>
+        <fieldset class="segmented">
+          <legend>Tamanho</legend>
+          <label><input type="radio" name="size" value="a4" checked><span>A4</span></label>
+          <label><input type="radio" name="size" value="letter"><span>Carta</span></label>
+          <label><input type="radio" name="size" value="fit"><span>Ajustar à imagem</span></label>
+        </fieldset>
+        <fieldset class="segmented" id="orientation-group">
+          <legend>Orientação</legend>
+          <label><input type="radio" name="orientation" value="auto" checked><span>Automática</span></label>
+          <label><input type="radio" name="orientation" value="portrait"><span>Retrato</span></label>
+          <label><input type="radio" name="orientation" value="landscape"><span>Paisagem</span></label>
+        </fieldset>
+        <label for="margin">Margem</label>
+        <select id="margin">
+          <option value="0">Sem margem</option>
+          <option value="5">5 mm</option>
+          <option value="10" selected>10 mm</option>
+          <option value="20">20 mm</option>
+        </select>
+        <label class="check"><input type="checkbox" id="no-upscale"> Não ampliar imagens pequenas</label>
+        <p class="muted small">Na orientação automática, imagem deitada ganha página deitada. Em "Ajustar à imagem", a página tem o tamanho da imagem (a 96 dpi, ou na resolução do arquivo quando for uma digitalização de 150 dpi ou mais).</p>
+      </section>
+
+      <section class="card" aria-labelledby="quality-title">
+        <h2 id="quality-title">Qualidade e tamanho</h2>
+        <label class="check"><input type="checkbox" id="keep" checked> Manter os JPEGs originais, sem recompressão, quando possível</label>
+        <label for="quality">Qualidade da recompressão: <output id="quality-out" for="quality">80%</output></label>
+        <input id="quality" type="range" min="30" max="95" step="5" value="80">
+        <label for="max-side">Lado maior da imagem</label>
+        <select id="max-side">
+          <option value="0" selected>Tamanho original</option>
+          <option value="3000">Até 3000 px</option>
+          <option value="2400">Até 2400 px</option>
+          <option value="2000">Até 2000 px</option>
+          <option value="1600">Até 1600 px</option>
+          <option value="1200">Até 1200 px</option>
+        </select>
+        <label class="check"><input type="checkbox" id="gray"> Tons de cinza (bom para documentos e recibos)</label>
+        <p class="muted small">PNG e WebP sempre passam pela recompressão JPEG (transparência vira fundo branco). Reduzir o lado maior é o jeito mais eficiente de diminuir o arquivo.</p>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="pdf-title">
+      <h2 id="pdf-title">Gerar PDF</h2>
+      <div class="grid-2 tight">
+        <div>
+          <label for="filename">Nome do arquivo</label>
+          <input id="filename" type="text" value="imagens.pdf" autocomplete="off" spellcheck="false">
+        </div>
+        <div>
+          <label for="title">Título do documento (opcional)</label>
+          <input id="title" type="text" autocomplete="off">
+        </div>
+      </div>
+      <p id="estimate" class="estimate" aria-live="polite">Adicione imagens para começar.</p>
+      <div class="actions">
+        <button type="button" class="btn" id="generate" disabled>Gerar PDF</button>
+        <a class="btn secondary" id="open-pdf" target="_blank" rel="noopener" hidden>Abrir o PDF</a>
+      </div>
+      <div id="pdf-msg" class="notes" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Tudo roda no seu navegador. <a href="https://github.com/micdog22/imagens-para-pdf">Código aberto no GitHub</a> · Licença MIT</p>
+  </footer>
+</body>
+</html>

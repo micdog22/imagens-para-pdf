@@ -1,0 +1,11 @@
+{
+  "name": "imagens-para-pdf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Junte fotos JPEG, PNG e WebP em um PDF direto no navegador, com escritor de PDF feito à mão, orientação EXIF e recompressão opcional.",
+  "type": "module",
+  "scripts": { "test": "node --test" },
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/micdog22/imagens-para-pdf.git" },
+  "homepage": "https://micdog22.github.io/imagens-para-pdf/"
+}
